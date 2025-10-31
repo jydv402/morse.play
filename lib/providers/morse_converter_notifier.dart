@@ -1,17 +1,18 @@
 import 'package:morse_web_play/barrel.dart';
 
-class MorseConvertorNotifier extends Notifier<MorseConverterState> {
+class MorseConverterNotifier extends Notifier<MorseConverterState> {
   @override
   MorseConverterState build() {
     return const MorseConverterState();
   }
 
   //Logic function
+  // Calls the textToMorse function from the MorseService and updates the state with the new result
   void textToMorse(String text) {
     // Define a MorseService instance
     final morseService = ref.read(morseServiceProvider);
 
-    // Call the textToMorse method
+    // Call the textToMorse method found in MorseService
     final morseCode = morseService.textToMorse(text);
 
     // Update state
@@ -20,6 +21,6 @@ class MorseConvertorNotifier extends Notifier<MorseConverterState> {
 }
 
 final morseConverterProvider =
-    NotifierProvider<MorseConvertorNotifier, MorseConverterState>(() {
-      return MorseConvertorNotifier();
+    NotifierProvider<MorseConverterNotifier, MorseConverterState>(() {
+      return MorseConverterNotifier();
     });

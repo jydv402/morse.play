@@ -9,7 +9,7 @@ export 'package:morse_web_play/services/morse_serv.dart';
 
 // Providers
 export 'package:morse_web_play/providers/morse_provider.dart';
-export 'package:morse_web_play/providers/morse_convertor_notifier.dart';
+export 'package:morse_web_play/providers/morse_converter_notifier.dart';
 
 // Models
 export 'package:morse_web_play/models/morse_state.dart';
