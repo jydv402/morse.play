@@ -4,7 +4,7 @@ class MorseAudioService {
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   // 1 unit duration = 60ms
-  static const int _unitDuration = 60;
+  static const int _unitDuration = 80;
 
   // Dot duration is one unit
   final int _dotDuration = _unitDuration;

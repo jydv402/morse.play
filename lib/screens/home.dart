@@ -75,6 +75,17 @@ class TheHomePage extends ConsumerWidget {
                 ).textTheme.headlineMedium?.copyWith(fontSize: 32),
               ),
             ),
+
+            const SizedBox(height: 10),
+
+            // Play Button to play the audio
+            ElevatedButton.icon(
+              onPressed: () {
+                // Call the playMorse method
+                ref.read(morseConverterProvider.notifier).playMorse();
+              },
+              label: Icon(Icons.play_arrow_outlined),
+            ),
           ],
         ),
       ),

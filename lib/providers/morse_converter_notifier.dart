@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:morse_web_play/models/morse_state.dart';
+import 'package:morse_web_play/providers/audio_provider.dart';
 import 'package:morse_web_play/providers/morse_provider.dart';
 
 class MorseConverterNotifier extends Notifier<MorseConverterState> {
@@ -19,6 +20,15 @@ class MorseConverterNotifier extends Notifier<MorseConverterState> {
 
     // Update state
     state = state.copyWith(morseCode: morseCode, rawtext: text);
+  }
+
+  // Function to play the audio
+  void playMorse() async {
+    // Define the MorseAudioService instance
+    final audioService = ref.read(audioServiceProvider);
+
+    // Call the playMorse method found in MorseAudioService
+    await audioService.playMorse(state.morseCode);
   }
 }
 
