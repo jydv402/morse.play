@@ -7,9 +7,10 @@
 title: MVP 1 - Text to Morse Code Conversion Flow
 ---
 flowchart LR
-    A[UI Input] --> B[Notifier<br/>(MorseConverterProvider.textToMorse())]
-    B --> C[Service<br/>(MorseService.textToMorse())]
-    C --> D[Update State and Rebuild UI]
+    A[UI Input]
+    B[Notifier (MorseConverterProvider.textToMorse())]
+    C[Service (MorseService.textToMorse())]
+    D[Update State and Rebuild UI]
 
-
+    A --> B --> C --> D
 ```
