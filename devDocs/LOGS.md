@@ -4,16 +4,12 @@
 - UI layer gets and input from the user and shows the converted text
 ```mermaid
 ---
-title: MVP 1
+title: MVP 1 - Text to Morse Code Conversion Flow
 ---
-graph LR
-    class UIInput
-    class Notifier
-    class Service
-    class UpdateStateAndUI
+flowchart LR
+    A[UI Input] --> B[Notifier<br/>(MorseConverterProvider.textToMorse())]
+    B --> C[Service<br/>(MorseService.textToMorse())]
+    C --> D[Update State and Rebuild UI]
 
-    UIInput --> Notifier[textToMorse()]
-    Notifier --> Service[textToMorse()]
-    Service --> UpdateStateAndUI[]
 
 ```
