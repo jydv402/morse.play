@@ -1,4 +1,6 @@
-import 'package:morse_web_play/barrel.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:morse_web_play/providers/morse_converter_notifier.dart';
 
 class TheHomePage extends ConsumerWidget {
   const TheHomePage({super.key});

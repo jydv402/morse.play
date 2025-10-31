@@ -1,4 +1,6 @@
-import 'package:morse_web_play/barrel.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:morse_web_play/models/morse_state.dart';
+import 'package:morse_web_play/providers/morse_provider.dart';
 
 class MorseConverterNotifier extends Notifier<MorseConverterState> {
   @override
