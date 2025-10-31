@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:morse_web_play/providers/audio_provider.dart';
 import 'package:morse_web_play/providers/morse_converter_notifier.dart';
 
 class TheHomePage extends ConsumerWidget {
@@ -7,7 +8,9 @@ class TheHomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Access the entire state
     final morseState = ref.watch(morseConverterProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("morse.play"),
@@ -79,13 +82,16 @@ class TheHomePage extends ConsumerWidget {
             const SizedBox(height: 10),
 
             // Play Button to play the audio
-            ElevatedButton.icon(
-              onPressed: () {
-                // Call the playMorse method
-                ref.read(morseConverterProvider.notifier).playMorse();
-              },
-              label: Icon(Icons.play_arrow_outlined),
-            ),
+            if (morseState.morseCode.isNotEmpty)
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Call the playMorse method
+                  ref.read(morseConverterProvider.notifier).playMorse();
+                },
+                label: morseState.isPlaying
+                    ? Icon(Icons.stop)
+                    : Icon(Icons.play_arrow_outlined),
+              ),
           ],
         ),
       ),

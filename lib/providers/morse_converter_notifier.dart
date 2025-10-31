@@ -27,8 +27,25 @@ class MorseConverterNotifier extends Notifier<MorseConverterState> {
     // Define the MorseAudioService instance
     final audioService = ref.read(audioServiceProvider);
 
+    if (state.isPlaying) {
+      audioService.stopAudio();
+      state = state.copyWith(isPlaying: false);
+      return;
+    }
+
+    // Set isplaying to true
+    state = state.copyWith(isPlaying: true);
+
     // Call the playMorse method found in MorseAudioService
-    await audioService.playMorse(state.morseCode);
+    try {
+      await audioService.playMorse(state.morseCode);
+    } catch (e) {
+      // Handle any errors during playback
+      print("Audio playback error: $e");
+    } finally {
+      // Set isplaying to false
+      state = state.copyWith(isPlaying: false);
+    }
   }
 }
 

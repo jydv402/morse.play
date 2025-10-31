@@ -86,6 +86,7 @@ class MorseAudioService {
 
   // Audio stop function
   void stopAudio() async {
+    isPlaying = false;
     await _audioPlayer.stop();
   }
 
