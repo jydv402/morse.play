@@ -6,7 +6,14 @@
 ---
 title: MVP 1
 ---
-flowchart LR
-    UI input --> Notifier (MorseConverterProvider.textToMorse()) --> Service (Does the conversion -> MorseService.textToMorse()) --> Update state and UI rebuilt 
+graph LR
+    class UIInput
+    class Notifier
+    class Service
+    class UpdateStateAndUI
+
+    UIInput --> Notifier[textToMorse()]
+    Notifier --> Service[textToMorse()]
+    Service --> UpdateStateAndUI[]
 
 ```
