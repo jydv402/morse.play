@@ -14,7 +14,28 @@ class PlatformDecider extends ConsumerWidget {
     // Read the notifier for state changes
     final navNotifier = ref.read(navProvider.notifier);
 
-    final destinations = const [
+    final barDestinations = const [
+      BottomNavigationBarItem(
+        icon: Icon(Icons.home_outlined),
+        activeIcon: Icon(Icons.home_rounded, color: Colors.lightGreenAccent),
+        label: 'Convert',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.book_outlined),
+        activeIcon: Icon(Icons.book_rounded, color: Colors.lightGreenAccent),
+        label: 'Book',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.favorite_border_rounded),
+        activeIcon: Icon(
+          Icons.favorite_rounded,
+          color: Colors.lightGreenAccent,
+        ),
+        label: 'Credits',
+      ),
+    ];
+
+    final railDestinations = const [
       NavigationRailDestination(
         icon: Icon(Icons.home_outlined),
         selectedIcon: Icon(Icons.home_rounded, color: Colors.lightGreenAccent),
@@ -48,7 +69,23 @@ class PlatformDecider extends ConsumerWidget {
       builder: (context, constraints) {
         if (constraints.maxWidth < 600) {
           // Small screen
-          return Text("Small Screen UI");
+          return SafeArea(
+            child: Scaffold(
+              body: getPage(currentSection),
+              bottomNavigationBar: BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
+                items: barDestinations,
+                currentIndex: currentSection.index,
+                onTap: (int index) {
+                  // Call the Notifier with the new section
+                  navNotifier.changeSection(AppSection.values[index]);
+                },
+                backgroundColor: Colors.black,
+                selectedItemColor: Colors.lightGreenAccent,
+                unselectedItemColor: Colors.grey,
+              ),
+            ),
+          );
         } else {
           // Large screen
           return Scaffold(
@@ -63,7 +100,7 @@ class PlatformDecider extends ConsumerWidget {
                   },
                   labelType: NavigationRailLabelType.all,
                   backgroundColor: Colors.black, // Match your theme
-                  destinations: destinations,
+                  destinations: railDestinations,
                 ),
 
                 // Vertical Divider for separation
