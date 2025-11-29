@@ -17,7 +17,9 @@ class TheHomePage extends ConsumerWidget {
       child: Column(
         children: [
           BrandBar(),
-          Row(
+          Flex(
+            direction: Axis.horizontal,
+
             spacing: 12,
             children: [
               ConverterPill(headText: "Input", child: Text("Input")),

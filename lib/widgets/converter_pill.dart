@@ -11,6 +11,7 @@ class ConverterPill extends StatelessWidget {
     // Return expanded containers
     return Expanded(
       child: Container(
+        alignment: Alignment.centerLeft,
         padding: EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: pillsBg,

@@ -27,7 +27,7 @@ class CustomSidebar extends StatelessWidget {
     ];
 
     return Container(
-      width: maxWidth / 7 > 200 ? 200 : maxWidth / 7,
+      width: maxWidth > 1000 ? 200 : 80,
       margin: const EdgeInsets.fromLTRB(12, 12, 0, 12),
       decoration: BoxDecoration(
         color: pillsBg,
@@ -44,6 +44,7 @@ class CustomSidebar extends StatelessWidget {
               selectedIcon: selectedIcon,
               label: label,
               onTap: () => onSectionSelected(section),
+              expanded: expanded,
             ),
           const Spacer(),
         ],
@@ -58,6 +59,7 @@ class _SidebarItem extends StatelessWidget {
   final String selectedIcon;
   final String label;
   final VoidCallback onTap;
+  final bool expanded;
 
   const _SidebarItem({
     required this.isSelected,
@@ -65,6 +67,7 @@ class _SidebarItem extends StatelessWidget {
     required this.selectedIcon,
     required this.label,
     required this.onTap,
+    required this.expanded,
   });
 
   @override
@@ -77,7 +80,6 @@ class _SidebarItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         splashColor: violetMorse,
         onTap: onTap,
-
         child: Container(
           margin: EdgeInsets.symmetric(horizontal: 4),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -86,11 +88,14 @@ class _SidebarItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
+            mainAxisAlignment: expanded
+                ? MainAxisAlignment.start
+                : MainAxisAlignment.center,
             spacing: 6,
             children: [
               Iconify(isSelected ? selectedIcon : icon, color: color, size: 24),
               const SizedBox(height: 4),
-              Text(label, style: TextStyle(color: color)),
+              if (expanded) Text(label, style: TextStyle(color: color)),
             ],
           ),
         ),

@@ -69,22 +69,19 @@ class PlatformDecider extends ConsumerWidget {
       builder: (context, constraints) {
         if (constraints.maxWidth < 600) {
           // Small screen
-          return SafeArea(
-            child: Scaffold(
-              appBar: AppBar(title: const Text("Morse Web Play")),
-              body: getPage(currentSection),
-              bottomNavigationBar: BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
-                items: barDestinations,
-                currentIndex: currentSection.index,
-                onTap: (int index) {
-                  // Call the Notifier with the new section
-                  navNotifier.changeSection(AppSection.values[index]);
-                },
-                backgroundColor: Colors.black,
-                selectedItemColor: Colors.lightGreenAccent,
-                unselectedItemColor: Colors.grey,
-              ),
+          return Scaffold(
+            body: getPage(currentSection),
+            bottomNavigationBar: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              items: barDestinations,
+              currentIndex: currentSection.index,
+              onTap: (int index) {
+                // Call the Notifier with the new section
+                navNotifier.changeSection(AppSection.values[index]);
+              },
+              backgroundColor: Colors.black,
+              selectedItemColor: Colors.lightGreenAccent,
+              unselectedItemColor: Colors.grey,
             ),
           );
         } else {
@@ -98,7 +95,7 @@ class PlatformDecider extends ConsumerWidget {
                   onSectionSelected: (value) =>
                       navNotifier.changeSection(value),
                   maxWidth: constraints.maxWidth,
-                  expanded: constraints.maxWidth > 920,
+                  expanded: constraints.maxWidth > 1000,
                 ),
                 Expanded(child: getPage(currentSection)),
               ],
