@@ -11,6 +11,7 @@ class ConverterPill extends StatelessWidget {
     // Return expanded containers
     return Expanded(
       child: Container(
+        height: MediaQuery.of(context).size.height - 116,
         alignment: Alignment.centerLeft,
         padding: EdgeInsets.all(24),
         decoration: BoxDecoration(
