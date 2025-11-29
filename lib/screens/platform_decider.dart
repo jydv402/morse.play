@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:morse_web_play/models/colors.dart';
 import 'package:morse_web_play/models/nav_model.dart';
 import 'package:morse_web_play/providers/nav_provider.dart';
+import 'package:morse_web_play/screens/book.dart';
 import 'package:morse_web_play/screens/home.dart';
+import 'package:morse_web_play/widgets/sidebar.dart';
 
 class PlatformDecider extends ConsumerWidget {
   const PlatformDecider({super.key});
@@ -17,20 +20,17 @@ class PlatformDecider extends ConsumerWidget {
     final barDestinations = const [
       BottomNavigationBarItem(
         icon: Icon(Icons.home_outlined),
-        activeIcon: Icon(Icons.home_rounded, color: Colors.lightGreenAccent),
+        activeIcon: Icon(Icons.home_rounded),
         label: 'Convert',
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.book_outlined),
-        activeIcon: Icon(Icons.book_rounded, color: Colors.lightGreenAccent),
+        activeIcon: Icon(Icons.book_rounded),
         label: 'Book',
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.favorite_border_rounded),
-        activeIcon: Icon(
-          Icons.favorite_rounded,
-          color: Colors.lightGreenAccent,
-        ),
+        activeIcon: Icon(Icons.favorite_rounded),
         label: 'Credits',
       ),
     ];
@@ -58,7 +58,7 @@ class PlatformDecider extends ConsumerWidget {
         case AppSection.converter:
           return const TheHomePage();
         case AppSection.book:
-          return Text("Book");
+          return const BookPage();
         case AppSection.credits:
           return Text("Credits");
       }
@@ -71,6 +71,7 @@ class PlatformDecider extends ConsumerWidget {
           // Small screen
           return SafeArea(
             child: Scaffold(
+              appBar: AppBar(title: const Text("Morse Web Play")),
               body: getPage(currentSection),
               bottomNavigationBar: BottomNavigationBar(
                 type: BottomNavigationBarType.fixed,
@@ -89,30 +90,17 @@ class PlatformDecider extends ConsumerWidget {
         } else {
           // Large screen
           return Scaffold(
-            appBar: AppBar(title: const Text("Morse Web Play")),
+            backgroundColor: lightBg,
             body: Row(
               children: [
-                NavigationRail(
-                  selectedIndex: currentSection.index,
-                  onDestinationSelected: (int index) {
-                    // Call the Notifier with the new section
-                    navNotifier.changeSection(AppSection.values[index]);
-                  },
-                  labelType: NavigationRailLabelType.all,
-                  backgroundColor: Colors.black, // Match your theme
-                  destinations: railDestinations,
+                CustomSidebar(
+                  selectedSection: currentSection,
+                  onSectionSelected: (value) =>
+                      navNotifier.changeSection(value),
+                  maxWidth: constraints.maxWidth,
+                  expanded: constraints.maxWidth > 920,
                 ),
-
-                // Vertical Divider for separation
-                const VerticalDivider(
-                  thickness: 1,
-                  width: 1,
-                  color: Colors.lightGreenAccent,
-                ),
-
-                Expanded(
-                  child: getPage(currentSection), // Show the current screen
-                ),
+                Expanded(child: getPage(currentSection)),
               ],
             ),
           );

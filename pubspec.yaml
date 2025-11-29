@@ -39,7 +39,8 @@ dependencies:
   responsive: ^0.3.11+11
   flutter_launcher_icons: ^0.14.4
   flutter_animate: ^4.5.2
-  line_awesome_flutter: ^3.0.1
+  google_fonts: ^6.3.2
+  iconify_flutter: ^0.0.7
 
 dev_dependencies:
   flutter_test:
@@ -50,7 +51,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   custom_lint: ^0.8.0
   riverpod_lint: ^3.0.3
 
