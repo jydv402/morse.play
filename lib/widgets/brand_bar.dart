@@ -3,12 +3,21 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:morse_web_play/models/colors.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BrandBar extends StatelessWidget {
   const BrandBar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final Uri url = Uri.parse('https://github.com/jydv402/morse_web_play');
+
+    Future<void> launchLink() async {
+      if (!await launchUrl(url)) {
+        throw Exception('Could not launch $url');
+      }
+    }
+
     return Container(
       height: 80,
       padding: EdgeInsets.symmetric(horizontal: 24),
@@ -23,9 +32,7 @@ class BrandBar extends StatelessWidget {
           Text("morse.play", style: GoogleFonts.nabla(fontSize: 36)),
           Spacer(),
           InkWell(
-            onTap: () {
-              // TODO: Add link
-            },
+            onTap: launchLink,
             child: Iconify(
               Ph.github_logo_duotone,
               size: 28,
