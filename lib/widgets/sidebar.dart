@@ -35,7 +35,29 @@ class CustomSidebar extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const SizedBox(height: 6),
+          const SizedBox(height: 12),
+          // Logo
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: greenMorse,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisAlignment: expanded
+                  ? MainAxisAlignment.start
+                  : MainAxisAlignment.center,
+              spacing: 6,
+              children: [
+                Image.asset('assets/morseLogo.png', height: 30),
+                const SizedBox(height: 4),
+                if (expanded)
+                  Text('morse.play', style: TextStyle(color: Colors.black87)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
           // Nav items
           for (final (section, icon, selectedIcon, label) in barItems)
             _SidebarItem(
@@ -47,6 +69,17 @@ class CustomSidebar extends StatelessWidget {
               expanded: expanded,
             ),
           const Spacer(),
+
+          // Theme switcher button
+          _SidebarItem(
+            isSelected: true,
+            icon: Ph.moon_fill,
+            selectedIcon: Ph.sun_fill,
+            label: 'Switch Theme',
+            onTap: () {},
+            expanded: expanded,
+          ),
+          const SizedBox(height: 12),
         ],
       ),
     );
