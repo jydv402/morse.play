@@ -35,7 +35,7 @@ class CustomSidebar extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const SizedBox(height: 32),
+          const SizedBox(height: 6),
           // Nav items
           for (final (section, icon, selectedIcon, label) in barItems)
             _SidebarItem(

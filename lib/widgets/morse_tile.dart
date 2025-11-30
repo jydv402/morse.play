@@ -11,6 +11,8 @@ class MorseTiles extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Container(
+        height: 200,
+        width: 200,
         margin: const EdgeInsets.all(0),
         decoration: BoxDecoration(
           color: pillsBg,

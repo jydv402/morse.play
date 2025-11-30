@@ -17,15 +17,17 @@ class _BookPageState extends ConsumerState<BookPage> {
   Widget build(BuildContext context) {
     final morse = ref.watch(morseServiceProvider);
 
+    // Display the morse code in a grid format
     return GridView.builder(
       itemCount: morse.morseCode.length,
+      // Define how much grid items to be shown per row. Max value can be 5
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: min(MediaQuery.of(context).size.width ~/ 200, 5),
       ),
       itemBuilder: (context, index) {
         return MorseTiles(
-          char: morse.morseCode.keys.toList()[index],
-          code: morse.morseCode.values.toList()[index],
+          char: morse.morseCode.keys.toList()[index], // The alphabets
+          code: morse.morseCode.values.toList()[index], // The morse codes
         );
       },
     );

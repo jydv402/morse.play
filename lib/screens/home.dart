@@ -22,8 +22,71 @@ class TheHomePage extends ConsumerWidget {
 
             spacing: 12,
             children: [
-              ConverterPill(headText: "Input", child: Text("Input")),
-              ConverterPill(headText: "Output", child: Text("Output")),
+              ConverterPill(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      child: Text(
+                        "Input",
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 50),
+                      child: TextField(
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        decoration: InputDecoration(
+                          hintText: 'Type something...',
+                          hintStyle: TextStyle(color: Colors.black54),
+                        ),
+                        onChanged: (value) {
+                          // Call the textToMorse method
+                          ref
+                              .read(morseConverterProvider.notifier)
+                              .textToMorse(value);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ConverterPill(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      child: Text(
+                        "Output",
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 50, bottom: 24),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: SizedBox(
+                          child: SelectableText(
+                            // If the morse code is empty, display '...'
+                            morseState.morseCode.isEmpty
+                                ? '...'
+                                : morseState.morseCode,
+                            style: Theme.of(
+                              context,
+                            ).textTheme.headlineMedium?.copyWith(fontSize: 32),
+
+                            //overflow: TextOverflow.visible,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ],
