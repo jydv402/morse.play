@@ -5,7 +5,9 @@ import 'package:morse_web_play/models/nav_model.dart';
 import 'package:morse_web_play/providers/nav_provider.dart';
 import 'package:morse_web_play/screens/book.dart';
 import 'package:morse_web_play/screens/home.dart';
+import 'package:morse_web_play/widgets/bottombar.dart';
 import 'package:morse_web_play/widgets/sidebar.dart';
+import 'package:morse_web_play/screens/credits.dart';
 
 class PlatformDecider extends ConsumerWidget {
   const PlatformDecider({super.key});
@@ -17,42 +19,6 @@ class PlatformDecider extends ConsumerWidget {
     // Read the notifier for state changes
     final navNotifier = ref.read(navProvider.notifier);
 
-    final barDestinations = const [
-      BottomNavigationBarItem(
-        icon: Icon(Icons.home_outlined),
-        activeIcon: Icon(Icons.home_rounded),
-        label: 'Convert',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.book_outlined),
-        activeIcon: Icon(Icons.book_rounded),
-        label: 'Book',
-      ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.favorite_border_rounded),
-        activeIcon: Icon(Icons.favorite_rounded),
-        label: 'Credits',
-      ),
-    ];
-
-    final railDestinations = const [
-      NavigationRailDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded, color: Colors.lightGreenAccent),
-        label: Text('Convert'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.book_outlined),
-        selectedIcon: Icon(Icons.book_rounded, color: Colors.lightGreenAccent),
-        label: Text('Book'),
-      ),
-      NavigationRailDestination(
-        icon: Icon(Icons.favorite_border_rounded),
-        selectedIcon: Icon(Icons.favorite_rounded, color: Colors.red),
-        label: Text('Credits'),
-      ),
-    ];
-
     Widget getPage(AppSection section) {
       switch (section) {
         case AppSection.converter:
@@ -60,7 +26,7 @@ class PlatformDecider extends ConsumerWidget {
         case AppSection.book:
           return const BookPage();
         case AppSection.credits:
-          return Text("Credits");
+          return const CreditsPage();
       }
     }
 
@@ -70,18 +36,15 @@ class PlatformDecider extends ConsumerWidget {
         if (constraints.maxWidth < 600) {
           // Small screen
           return Scaffold(
+            backgroundColor: lightBg,
             body: getPage(currentSection),
-            bottomNavigationBar: BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              items: barDestinations,
+            bottomNavigationBar: BottomBar(
               currentIndex: currentSection.index,
               onTap: (int index) {
-                // Call the Notifier with the new section
                 navNotifier.changeSection(AppSection.values[index]);
               },
-              backgroundColor: Colors.black,
-              selectedItemColor: Colors.lightGreenAccent,
-              unselectedItemColor: Colors.grey,
+              boxColor: pillsBg,
+              selectedColor: violetMorse,
             ),
           );
         } else {

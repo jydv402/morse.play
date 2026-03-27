@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ph.dart';
+import 'package:morse_web_play/main.dart';
 import 'package:morse_web_play/models/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// A widget that displays the brand name and a link to the GitHub repository.
 class BrandBar extends StatelessWidget {
   const BrandBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final Uri url = Uri.parse('https://github.com/jydv402/morse_web_play');
-
     Future<void> launchLink() async {
-      if (!await launchUrl(url)) {
-        throw Exception('Could not launch $url');
+      if (!await launchUrl(Consts.url)) {
+        throw Exception('Could not launch ${Consts.url}');
       }
     }
 

@@ -19,3 +19,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+class Consts {
+  static final Uri url = Uri.parse('https://github.com/jydv402/morse_web_play');
+}

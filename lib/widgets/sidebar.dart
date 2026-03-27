@@ -4,6 +4,7 @@ import 'package:iconify_flutter/icons/ph.dart';
 import 'package:morse_web_play/models/colors.dart';
 import 'package:morse_web_play/models/nav_model.dart';
 
+/// Custom sidebar widget for navigation.
 class CustomSidebar extends StatelessWidget {
   final AppSection selectedSection;
   final ValueChanged<AppSection> onSectionSelected;
