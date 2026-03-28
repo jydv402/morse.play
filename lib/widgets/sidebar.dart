@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ph.dart';
+import 'package:morse_web_play/models/colors.dart';
 import 'package:morse_web_play/models/nav_model.dart';
 import 'package:morse_web_play/providers/theme_provider.dart';
 
@@ -69,23 +70,57 @@ class CustomSidebar extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 20),
-          // Nav items
-          for (final (section, icon, selectedIcon, label) in barItems)
-            _SidebarItem(
-              isSelected: section == selectedSection,
-              icon: icon,
-              selectedIcon: selectedIcon,
-              label: label,
-              onTap: () => onSectionSelected(section),
-              expanded: expanded,
-            ),
+          // Nav items with animated pill background
+          Stack(
+            children: [
+              // Animated pill background
+              Positioned.fill(
+                child: AnimatedAlign(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOutSine,
+                  alignment: Alignment(
+                    0,
+                    -1 + (selectedSection.index * (2 / (barItems.length - 1))),
+                  ),
+                  child: FractionallySizedBox(
+                    heightFactor: 1 / barItems.length,
+                    child: Center(
+                      child: Container(
+                        width: maxWidth > 1000 ? 190 : 70,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: violetMorse,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Actual nav items
+              Column(
+                children: [
+                  for (final (section, icon, selectedIcon, label) in barItems)
+                    _SidebarItem(
+                      isSelected: section == selectedSection,
+                      icon: icon,
+                      selectedIcon: selectedIcon,
+                      label: label,
+                      onTap: () => onSectionSelected(section),
+                      expanded: expanded,
+                    ),
+                ],
+              ),
+            ],
+          ),
           const Spacer(),
 
           // Theme switcher button
           _SidebarItem(
-            isSelected: true,
-            icon: isDark ? Ph.moon_fill : Ph.sun_fill,
-            selectedIcon: isDark ? Ph.moon_fill : Ph.sun_fill,
+            isSelected: false,
+            icon: isDark ? Ph.moon_duotone : Ph.sun_duotone,
+            selectedIcon: isDark ? Ph.moon_duotone : Ph.sun_duotone,
             label: isDark ? 'Dark Mode' : 'Light Mode',
             onTap: () {
               ref
@@ -137,7 +172,7 @@ class _SidebarItem extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 4),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? colorScheme.primary : Colors.transparent,
+            color: Colors.transparent,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(

@@ -22,16 +22,12 @@ class PlatformDecider extends ConsumerWidget {
     // Get theme mode
     final themeMode = ref.watch(themeProvider);
 
-    Widget getPage(AppSection section) {
-      switch (section) {
-        case AppSection.converter:
-          return const TheHomePage();
-        case AppSection.book:
-          return const BookPage();
-        case AppSection.credits:
-          return const CreditsPage();
-      }
-    }
+    // List of pages to be kept alive in IndexedStack
+    const pages = [
+      TheHomePage(),
+      BookPage(),
+      CreditsPage(),
+    ];
 
     // Define the LayoutBuilder
     return LayoutBuilder(
@@ -40,7 +36,10 @@ class PlatformDecider extends ConsumerWidget {
           // Small screen
           return Scaffold(
             backgroundColor: themeMode == ThemeMode.light ? lightBg : darkBg,
-            body: getPage(currentSection),
+            body: IndexedStack(
+              index: currentSection.index,
+              children: pages,
+            ),
             bottomNavigationBar: BottomBar(
               currentIndex: currentSection.index,
               onTap: (int index) {
@@ -61,7 +60,12 @@ class PlatformDecider extends ConsumerWidget {
                   maxWidth: constraints.maxWidth,
                   expanded: constraints.maxWidth > 1000,
                 ),
-                Expanded(child: getPage(currentSection)),
+                Expanded(
+                  child: IndexedStack(
+                    index: currentSection.index,
+                    children: pages,
+                  ),
+                ),
               ],
             ),
           );

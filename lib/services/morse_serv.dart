@@ -1,7 +1,69 @@
+class MorseEntry {
+  final String char;
+  final String code;
+  const MorseEntry({required this.char, required this.code});
+}
+
 class MorseService {
-  // The Morse code dictionary.
-  final Map<String, String> morseCode = const {
-    // Alphabets in uppercase
+  static const List<MorseEntry> bookEntries = [
+    MorseEntry(char: 'A', code: '.-'),
+    MorseEntry(char: 'B', code: '-...'),
+    MorseEntry(char: 'C', code: '-.-.'),
+    MorseEntry(char: 'D', code: '-..'),
+    MorseEntry(char: 'E', code: '.'),
+    MorseEntry(char: 'F', code: '..-.'),
+    MorseEntry(char: 'G', code: '--.'),
+    MorseEntry(char: 'H', code: '....'),
+    MorseEntry(char: 'I', code: '..'),
+    MorseEntry(char: 'J', code: '.---'),
+    MorseEntry(char: 'K', code: '-.-'),
+    MorseEntry(char: 'L', code: '.-..'),
+    MorseEntry(char: 'M', code: '--'),
+    MorseEntry(char: 'N', code: '-.'),
+    MorseEntry(char: 'O', code: '---'),
+    MorseEntry(char: 'P', code: '.--.'),
+    MorseEntry(char: 'Q', code: '--.-'),
+    MorseEntry(char: 'R', code: '.-.'),
+    MorseEntry(char: 'S', code: '...'),
+    MorseEntry(char: 'T', code: '-'),
+    MorseEntry(char: 'U', code: '..-'),
+    MorseEntry(char: 'V', code: '...-'),
+    MorseEntry(char: 'W', code: '.--'),
+    MorseEntry(char: 'X', code: '-..-'),
+    MorseEntry(char: 'Y', code: '-.--'),
+    MorseEntry(char: 'Z', code: '--..'),
+    MorseEntry(char: '0', code: '-----'),
+    MorseEntry(char: '1', code: '.----'),
+    MorseEntry(char: '2', code: '..---'),
+    MorseEntry(char: '3', code: '...--'),
+    MorseEntry(char: '4', code: '....-'),
+    MorseEntry(char: '5', code: '.....'),
+    MorseEntry(char: '6', code: '-....'),
+    MorseEntry(char: '7', code: '--...'),
+    MorseEntry(char: '8', code: '---..'),
+    MorseEntry(char: '9', code: '----.'),
+    MorseEntry(char: '.', code: '.-.-.-'),
+    MorseEntry(char: ',', code: '--..--'),
+    MorseEntry(char: '?', code: '..--..'),
+    MorseEntry(char: '!', code: '-.-.--'),
+    MorseEntry(char: '/', code: '-..-.'),
+    MorseEntry(char: '(', code: '-.--.'),
+    MorseEntry(char: ')', code: '-.--.-'),
+    MorseEntry(char: ':', code: '---...'),
+    MorseEntry(char: ';', code: '-.-.-.'),
+    MorseEntry(char: '=', code: '-...-'),
+    MorseEntry(char: '+', code: '.-.-.'),
+    MorseEntry(char: '-', code: '-....-'),
+    MorseEntry(char: '"', code: '.-..-.'),
+    MorseEntry(char: '\$', code: '...-..-'),
+    MorseEntry(char: '@', code: '.--.-.'),
+    MorseEntry(char: '&', code: '.-...'),
+    MorseEntry(char: '_', code: '..--.-'),
+    MorseEntry(char: '\'', code: '.----.'),
+  ];
+
+  /// Static map of morse code.
+  static const Map<String, String> morseCode = {
     'A': '.-',
     'B': '-...',
     'C': '-.-.',
@@ -28,8 +90,6 @@ class MorseService {
     'X': '-..-',
     'Y': '-.--',
     'Z': '--..',
-
-    // Numbers
     '0': '-----',
     '1': '.----',
     '2': '..---',
@@ -40,8 +100,6 @@ class MorseService {
     '7': '--...',
     '8': '---..',
     '9': '----.',
-
-    // Symbols
     '.': '.-.-.-',
     ',': '--..--',
     '?': '..--..',
@@ -62,23 +120,21 @@ class MorseService {
     '\'': '.----.',
   };
 
-  // Coversion logic
-  String textToMorse(String text) {
-    // 1. Convert everything to uppercase.
-    // 2. Split into individual characters.
-    // 3. Obtain values for each keys (char):
-    //    - If it's a space, return two spaces ('  ') to represent a word break in Morse.
-    //    - Otherwise, look up the Morse code. If the character is not found, keep the original character.
-    // 4. Join the resulting Morse codes with a single space (' ') to represent a letter break.
+  /// Static method to convert text to Morse.
+  /// Decoupled from the Service instance so it can be used with `compute()`.
+  static String convert(String text) {
     return text
         .toUpperCase()
         .split('')
         .map((char) {
-          // Return two spaces if char is a space
           if (char == ' ') return '  ';
-          // '??' -> Null aware operator : if char is not found within the map, return char
           return morseCode[char] ?? char;
         })
         .join(' ');
+  }
+
+  // Non-static conversion logic (optional, for instance calls)
+  String textToMorse(String text) {
+    return convert(text);
   }
 }

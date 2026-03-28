@@ -1,8 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:morse_web_play/models/morse_state.dart';
 import 'package:morse_web_play/providers/audio_provider.dart';
-import 'package:morse_web_play/providers/morse_provider.dart';
-import 'package:morse_web_play/utils/logger.dart';
+import 'package:morse_web_play/services/morse_serv.dart';
 
 class MorseConverterNotifier extends Notifier<MorseConverterState> {
   @override
@@ -10,16 +10,24 @@ class MorseConverterNotifier extends Notifier<MorseConverterState> {
     return const MorseConverterState();
   }
 
-  //Logic function
-  // Calls the textToMorse function from the MorseService and updates the state with the new result
-  void textToMorse(String text) {
-    // Define a MorseService instance
-    final morseService = ref.read(morseServiceProvider);
+  /// Offloads the text-to-morse conversion to a background Isolate
+  /// using Flutter's compute function.
+  void textToMorse(String text) async {
+    // If input is very small, convert directly to avoid isolate overhead
+    if (text.length < 50) {
+      final morseCode = MorseService.convert(text);
+      state = state.copyWith(morseCode: morseCode, rawtext: text);
+      return;
+    }
 
-    // Call the textToMorse method found in MorseService
-    final morseCode = morseService.textToMorse(text);
+    // Create a local copy of text
+    final input = text;
 
-    // Update state
+    // Use compute to perform the conversion on a separate thread
+    final morseCode = await compute(MorseService.convert, input);
+
+    // Ensure the state update is only applied if the input hasn't changed
+    // in the meantime (optional check, depends on desired UX)
     state = state.copyWith(morseCode: morseCode, rawtext: text);
   }
 
@@ -42,7 +50,7 @@ class MorseConverterNotifier extends Notifier<MorseConverterState> {
       await audioService.playMorse(state.morseCode);
     } catch (e) {
       // Handle any errors during playback
-      logger.e("Audio playback error: $e");
+      debugPrint("Audio playback error: $e");
     } finally {
       // Set isplaying to false
       state = state.copyWith(isPlaying: false);
@@ -52,5 +60,5 @@ class MorseConverterNotifier extends Notifier<MorseConverterState> {
 
 final morseConverterProvider =
     NotifierProvider<MorseConverterNotifier, MorseConverterState>(() {
-      return MorseConverterNotifier();
-    });
+  return MorseConverterNotifier();
+});
