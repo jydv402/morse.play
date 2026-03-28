@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:morse_web_play/models/morse_state.dart';
 import 'package:morse_web_play/providers/audio_provider.dart';
 import 'package:morse_web_play/providers/morse_provider.dart';
+import 'package:morse_web_play/utils/logger.dart';
 
 class MorseConverterNotifier extends Notifier<MorseConverterState> {
   @override
@@ -41,7 +42,7 @@ class MorseConverterNotifier extends Notifier<MorseConverterState> {
       await audioService.playMorse(state.morseCode);
     } catch (e) {
       // Handle any errors during playback
-      print("Audio playback error: $e");
+      logger.e("Audio playback error: $e");
     } finally {
       // Set isplaying to false
       state = state.copyWith(isPlaying: false);
