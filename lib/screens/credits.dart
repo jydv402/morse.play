@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:morse_web_play/main.dart';
-import 'package:morse_web_play/models/colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CreditsPage extends StatelessWidget {
@@ -10,6 +9,8 @@ class CreditsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Center(
@@ -21,7 +22,7 @@ class CreditsPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: pillsBg,
+                  color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(32),
                 ),
                 child: Column(
@@ -30,7 +31,7 @@ class CreditsPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: greenMorse,
+                        color: colorScheme.secondary,
                         shape: BoxShape.circle,
                       ),
                       child: Image.asset('assets/morseLogo.png', height: 60),
@@ -40,7 +41,7 @@ class CreditsPage extends StatelessWidget {
                       'morse.play',
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -49,16 +50,16 @@ class CreditsPage extends StatelessWidget {
                       icon: Ph.star,
                       title: 'Star on GitHub',
                       subtitle: 'Support the project',
-                      color: violetMorse,
+                      color: colorScheme.primary,
                       onTap: () {
-                        launchUrl(Consts.url);
+                        launchUrl(Consts.projectUrl);
                       },
                     ),
                     _CreditItem(
                       icon: Ph.cpu_duotone,
                       title: 'Built with Flutter',
                       subtitle: 'Multi-platform framework',
-                      color: greenMorse,
+                      color: colorScheme.secondary,
                       onTap: () {
                         launchUrl(Uri.parse('https://flutter.dev'));
                       },
@@ -91,6 +92,9 @@ class _CreditItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -98,6 +102,7 @@ class _CreditItem extends StatelessWidget {
         children: [
           InkWell(
             onTap: onTap,
+            borderRadius: BorderRadius.circular(12),
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -106,7 +111,9 @@ class _CreditItem extends StatelessWidget {
               ),
               child: Iconify(
                 icon,
-                color: color == Colors.black12 ? Colors.black54 : color,
+                color: (isDark && color == colorScheme.secondary)
+                    ? color
+                    : (isDark ? Colors.white : color),
                 size: 24,
               ),
             ),
@@ -116,14 +123,18 @@ class _CreditItem extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
+                  color: colorScheme.onSurface,
                 ),
               ),
               Text(
                 subtitle,
-                style: const TextStyle(color: Colors.black54, fontSize: 12),
+                style: TextStyle(
+                  color: isDark ? Colors.white60 : Colors.black54,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),

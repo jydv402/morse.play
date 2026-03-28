@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ph.dart';
-import 'package:morse_web_play/models/colors.dart';
 import 'package:morse_web_play/models/nav_model.dart';
+import 'package:morse_web_play/providers/theme_provider.dart';
 
 /// Custom sidebar widget for navigation.
-class CustomSidebar extends StatelessWidget {
+class CustomSidebar extends ConsumerWidget {
   final AppSection selectedSection;
   final ValueChanged<AppSection> onSectionSelected;
   final double maxWidth;
@@ -20,7 +21,10 @@ class CustomSidebar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     final barItems = [
       (AppSection.converter, Ph.house_duotone, Ph.house_fill, 'Convert'),
       (AppSection.book, Ph.book_duotone, Ph.book_open_fill, 'Book'),
@@ -31,7 +35,7 @@ class CustomSidebar extends StatelessWidget {
       width: maxWidth > 1000 ? 200 : 80,
       margin: const EdgeInsets.fromLTRB(12, 12, 0, 12),
       decoration: BoxDecoration(
-        color: pillsBg,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
@@ -39,10 +43,10 @@ class CustomSidebar extends StatelessWidget {
           const SizedBox(height: 12),
           // Logo
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 4),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: greenMorse,
+              color: colorScheme.secondary,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -54,7 +58,13 @@ class CustomSidebar extends StatelessWidget {
                 Image.asset('assets/morseLogo.png', height: 30),
                 const SizedBox(height: 4),
                 if (expanded)
-                  Text('morse.play', style: TextStyle(color: Colors.black87)),
+                  const Text(
+                    'morse.play',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -74,10 +84,14 @@ class CustomSidebar extends StatelessWidget {
           // Theme switcher button
           _SidebarItem(
             isSelected: true,
-            icon: Ph.moon_fill,
-            selectedIcon: Ph.sun_fill,
-            label: 'Switch Theme',
-            onTap: () {},
+            icon: isDark ? Ph.moon_fill : Ph.sun_fill,
+            selectedIcon: isDark ? Ph.moon_fill : Ph.sun_fill,
+            label: isDark ? 'Dark Mode' : 'Light Mode',
+            onTap: () {
+              ref
+                  .read(themeProvider.notifier)
+                  .toggleTheme(Theme.of(context).brightness);
+            },
             expanded: expanded,
           ),
           const SizedBox(height: 12),
@@ -106,30 +120,43 @@ class _SidebarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected ? Colors.white : Colors.black54;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final color = isSelected
+        ? Colors.white
+        : (isDark ? Colors.grey : Colors.black87);
 
     return Padding(
       padding: const EdgeInsets.all(4),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        splashColor: violetMorse,
+        splashColor: colorScheme.primary.withValues(alpha: 0.3),
         onTap: onTap,
         child: Container(
-          margin: EdgeInsets.symmetric(horizontal: 4),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? violetMorse : Colors.transparent,
+            color: isSelected ? colorScheme.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             mainAxisAlignment: expanded
                 ? MainAxisAlignment.start
                 : MainAxisAlignment.center,
-            spacing: 6,
+            spacing: expanded ? 12 : 0,
             children: [
               Iconify(isSelected ? selectedIcon : icon, color: color, size: 24),
-              const SizedBox(height: 4),
-              if (expanded) Text(label, style: TextStyle(color: color)),
+              if (expanded)
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                ),
             ],
           ),
         ),

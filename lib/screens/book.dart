@@ -19,23 +19,25 @@ class _BookPageState extends ConsumerState<BookPage> {
     final width = MediaQuery.of(context).size.width;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: GridView.builder(
-        itemCount: morse.morseCode.length,
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          // Dynamically calculate the number of columns based on the screen width
-          crossAxisCount: min(width ~/ 200, 5),
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 0.9,
+      padding: const EdgeInsets.all(12),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: GridView.builder(
+          itemCount: morse.morseCode.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            // Dynamically calculate the number of columns based on the screen width
+            crossAxisCount: min(width ~/ 200, 5),
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 0.9,
+          ),
+          itemBuilder: (context, index) {
+            return MorseTiles(
+              char: morse.morseCode.keys.toList()[index],
+              code: morse.morseCode.values.toList()[index],
+            );
+          },
         ),
-        itemBuilder: (context, index) {
-          return MorseTiles(
-            char: morse.morseCode.keys.toList()[index],
-            code: morse.morseCode.values.toList()[index],
-          );
-        },
       ),
     );
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:morse_web_play/models/colors.dart';
 
 /// A widget that displays a single morse code tile.
 /// Used in the morse code book.
@@ -10,10 +9,12 @@ class MorseTiles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: pillsBg,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -21,10 +22,10 @@ class MorseTiles extends StatelessWidget {
         children: [
           Text(
             code,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
@@ -32,7 +33,7 @@ class MorseTiles extends StatelessWidget {
             char,
             style: TextStyle(
               fontSize: 18,
-              color: violetMorse,
+              color: colorScheme.primary,
               letterSpacing: 1.5,
               fontWeight: FontWeight.w500,
             ),

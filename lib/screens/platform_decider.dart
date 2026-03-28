@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:morse_web_play/models/colors.dart';
 import 'package:morse_web_play/models/nav_model.dart';
 import 'package:morse_web_play/providers/nav_provider.dart';
+import 'package:morse_web_play/providers/theme_provider.dart';
 import 'package:morse_web_play/screens/book.dart';
 import 'package:morse_web_play/screens/home.dart';
 import 'package:morse_web_play/widgets/bottombar.dart';
@@ -18,6 +19,8 @@ class PlatformDecider extends ConsumerWidget {
     final currentSection = ref.watch(navProvider);
     // Read the notifier for state changes
     final navNotifier = ref.read(navProvider.notifier);
+    // Get theme mode
+    final themeMode = ref.watch(themeProvider);
 
     Widget getPage(AppSection section) {
       switch (section) {
@@ -36,21 +39,19 @@ class PlatformDecider extends ConsumerWidget {
         if (constraints.maxWidth < 600) {
           // Small screen
           return Scaffold(
-            backgroundColor: lightBg,
+            backgroundColor: themeMode == ThemeMode.light ? lightBg : darkBg,
             body: getPage(currentSection),
             bottomNavigationBar: BottomBar(
               currentIndex: currentSection.index,
               onTap: (int index) {
                 navNotifier.changeSection(AppSection.values[index]);
               },
-              boxColor: pillsBg,
-              selectedColor: violetMorse,
             ),
           );
         } else {
           // Large screen
           return Scaffold(
-            backgroundColor: lightBg,
+            backgroundColor: themeMode == ThemeMode.light ? lightBg : darkBg,
             body: Row(
               children: [
                 CustomSidebar(
