@@ -192,9 +192,8 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
       },
     );
 
-    return ListenableBuilder(
-      listenable: _inputScrollController,
-      builder: (context, _) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
         return Stack(
           children: [
             textField,
@@ -207,6 +206,8 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
                 scrollOffset: _inputScrollController.hasClients
                     ? _inputScrollController.offset
                     : 0,
+                maxWidth: constraints.maxWidth,
+                maxHeight: constraints.maxHeight,
               ),
           ],
         );
@@ -250,9 +251,8 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
           )
         : outputText;
 
-    return ListenableBuilder(
-      listenable: _outputScrollController,
-      builder: (context, _) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
         return Stack(
           children: [
             content,
@@ -265,6 +265,8 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
                 scrollOffset: _outputScrollController.hasClients
                     ? _outputScrollController.offset
                     : 0,
+                maxWidth: constraints.maxWidth,
+                maxHeight: constraints.maxHeight,
               ),
           ],
         );
@@ -273,13 +275,14 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
   }
 }
 
-/// Feature 1: The moving pill indicator
 class _ProgressIndicatorPill extends StatelessWidget {
   final String text;
   final int currentIndex;
   final TextStyle style;
   final StrutStyle strutStyle;
   final double scrollOffset;
+  final double maxWidth;
+  final double maxHeight;
 
   const _ProgressIndicatorPill({
     required this.text,
@@ -287,6 +290,8 @@ class _ProgressIndicatorPill extends StatelessWidget {
     required this.style,
     required this.strutStyle,
     required this.scrollOffset,
+    required this.maxWidth,
+    required this.maxHeight,
   });
 
   @override
@@ -295,60 +300,54 @@ class _ProgressIndicatorPill extends StatelessWidget {
       return const SizedBox();
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Layout the text to find the character position
-        final tp = TextPainter(
-          text: TextSpan(text: text, style: style),
-          textDirection: TextDirection.ltr,
-          textScaler: MediaQuery.of(context).textScaler,
-          strutStyle: strutStyle,
-        )..layout(maxWidth: constraints.maxWidth);
+    // Layout the text to find the character position
+    final tp = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+      textScaler: MediaQuery.of(context).textScaler,
+      strutStyle: strutStyle,
+    )..layout(maxWidth: maxWidth);
 
-        final Offset offset = tp.getOffsetForCaret(
-          TextPosition(offset: currentIndex),
-          Rect.zero,
-        );
+    final Offset offset = tp.getOffsetForCaret(
+      TextPosition(offset: currentIndex),
+      Rect.zero,
+    );
 
-        final double topPosition = offset.dy - scrollOffset;
+    final double topPosition = offset.dy - scrollOffset;
 
-        // Hide if scrolled out
-        if (topPosition < -20 || topPosition > constraints.maxHeight) {
-          return const SizedBox();
-        }
+    // Hide if scrolled out
+    if (topPosition < -20 || topPosition > maxHeight) {
+      return const SizedBox();
+    }
 
-        // Calculate current character width
-        final currentLetterTp = TextPainter(
-          text: TextSpan(text: text[currentIndex], style: style),
-          textDirection: TextDirection.ltr,
-          textScaler: MediaQuery.of(context).textScaler,
-          strutStyle: strutStyle,
-        )..layout();
+    // Calculate current character width
+    final currentLetterTp = TextPainter(
+      text: TextSpan(text: text[currentIndex], style: style),
+      textDirection: TextDirection.ltr,
+      textScaler: MediaQuery.of(context).textScaler,
+      strutStyle: strutStyle,
+    )..layout();
 
-        return AnimatedPositioned(
-          duration: const Duration(milliseconds: 150),
-          curve: Curves.easeInOut,
-          top: topPosition - 6,
-          left: offset.dx,
-          child: Container(
-            width: currentLetterTp.width,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
-              borderRadius: BorderRadius.circular(2),
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.primary.withValues(alpha: 0.6),
-                  blurRadius: 12,
-                  spreadRadius: 2,
-                ),
-              ],
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 50),
+      curve: Curves.easeInOut,
+      top: topPosition + tp.preferredLineHeight - 4,
+      left: offset.dx,
+      child: Container(
+        width: currentLetterTp.width,
+        height: 6,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primary,
+          borderRadius: BorderRadius.circular(3),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
+              blurRadius: 10,
+              spreadRadius: 2,
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 }

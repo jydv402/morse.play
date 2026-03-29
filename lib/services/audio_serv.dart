@@ -62,16 +62,15 @@ class MorseAudioService {
 
         case ' ':
           // Detect word break (3 spaces) vs letter break (1 space)
-          // MorseService.convert uses '   ' for word breaks
           if (i + 2 < morseCode.length && morseCode[i + 1] == ' ' && morseCode[i + 2] == ' ') {
-            // It is a word break
+            // Word break: advance source index past both the character and the space
             if (isPlaying) await Future.delayed(Duration(milliseconds: _wordPauseDuration));
-            i += 2; // Skip the other two spaces
-            rawIndex++; // Source character was a space
+            i += 2;
+            rawIndex += 2; 
           } else {
-            // It is a letter break
+            // Letter break: source character finished
             if (isPlaying) await Future.delayed(Duration(milliseconds: _letterPauseDuration));
-            rawIndex++; // Source character finished
+            rawIndex++;
           }
           break;
 
