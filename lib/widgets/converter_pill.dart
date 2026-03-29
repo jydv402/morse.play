@@ -11,7 +11,7 @@ class ConverterPill extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      // Width is now handled by the parent (Expanded/Flexible)
+      width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: colorScheme.surface,

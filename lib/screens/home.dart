@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
-import 'package:iconify_flutter/icons/ph.dart';
 import 'package:morse_web_play/providers/morse_converter_notifier.dart';
 import 'package:morse_web_play/widgets/brand_bar.dart';
 import 'package:morse_web_play/widgets/converter_pill.dart';
@@ -15,174 +13,104 @@ class MorseConverterView extends ConsumerStatefulWidget {
 
 class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
   late final TextEditingController _textController;
+  late final ScrollController _inputScrollController;
+  late final ScrollController _outputScrollController;
 
   @override
   void initState() {
     super.initState();
-    // Initialize the controller with the current state value
     final initialState = ref.read(morseConverterProvider);
     _textController = TextEditingController(text: initialState.rawtext);
+    _inputScrollController = ScrollController();
+    _outputScrollController = ScrollController();
   }
 
   @override
   void dispose() {
     _textController.dispose();
+    _inputScrollController.dispose();
+    _outputScrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Get the current theme
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final TextTheme textTheme = Theme.of(context).textTheme;
-
-    // Check if the device is mobile
-    final bool isMobile = MediaQuery.of(context).size.width < 600;
-
-    // Set the icon size based on mobile/desktop
-    final double iconSize = isMobile ? 30 : 40;
-
-    // Watch the current state (Riverpod)
     final morseState = ref.watch(morseConverterProvider);
+    final size = MediaQuery.of(context).size;
+    final bool isMobile = size.width < 600;
 
-    // Sync the local controller if the state changed from outside
+    // Sync the local controller if changed externally
     if (_textController.text != morseState.rawtext) {
       _textController.text = morseState.rawtext;
     }
 
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
+    if (isMobile) {
+      return _buildMobileUI(context, morseState);
+    } else {
+      return _buildDesktopUI(context, morseState);
+    }
+  }
+
+  /// MOBILE UI: Expanding pills, entire page scrolls
+  Widget _buildMobileUI(BuildContext context, morseState) {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
           const BrandBar(),
+          _buildPillContainer(
+            context,
+            label: "Input",
+            child: _buildInputContent(context, morseState, expands: false),
+            expands: false,
+          ),
           const SizedBox(height: 12),
+          _buildPillContainer(
+            context,
+            label: "Output",
+            child: _buildOutputContent(context, morseState, expands: false),
+            expands: false,
+          ),
+          const SizedBox(height: 80), // Space for FAB
+        ],
+      ),
+    );
+  }
+
+  /// DESKTOP UI: Fixed proportions, internal scrolling
+  Widget _buildDesktopUI(BuildContext context, morseState) {
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        children: [
+          const BrandBar(),
           Expanded(
-            child: Flex(
-              direction: isMobile ? Axis.vertical : Axis.horizontal,
+            child: Row(
               spacing: 12,
               children: [
-                // INPUT SECTION
                 Expanded(
-                  child: ConverterPill(
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          child: Text(
-                            "Input",
-                            style: textTheme.headlineMedium?.copyWith(
-                              color: colorScheme.onSurface,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 50),
-                          child: TextField(
-                            controller: _textController,
-                            autofocus: true,
-                            style: textTheme.bodyLarge?.copyWith(
-                              color: colorScheme.onSurface,
-                              fontSize: 20,
-                            ),
-                            maxLines: null,
-                            expands: true,
-                            textAlignVertical: TextAlignVertical.top,
-                            decoration: InputDecoration(
-                              hintText: 'Type something...',
-                              hintStyle: TextStyle(
-                                color: colorScheme.onSurface.withValues(
-                                  alpha: 0.5,
-                                ),
-                              ),
-                              border: InputBorder.none,
-                            ),
-                            onChanged: (value) {
-                              ref
-                                  .read(morseConverterProvider.notifier)
-                                  .textToMorse(value);
-                            },
-                          ),
-                        ),
-                      ],
+                  child: _buildPillContainer(
+                    context,
+                    label: "Input",
+                    child: _buildInputContent(
+                      context,
+                      morseState,
+                      expands: true,
                     ),
+                    expands: true,
                   ),
                 ),
-                // OUTPUT SECTION
                 Expanded(
-                  child: ConverterPill(
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          child: Text(
-                            "Output",
-                            style: textTheme.headlineMedium?.copyWith(
-                              color: colorScheme.onSurface,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 50, bottom: 48),
-                          child: SingleChildScrollView(
-                            child: SelectableText(
-                              morseState.morseCode.isEmpty
-                                  ? '...'
-                                  : morseState.morseCode,
-                              style: textTheme.headlineMedium?.copyWith(
-                                fontSize: 32,
-                                letterSpacing: 2,
-                                color: colorScheme.onSurface,
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (morseState.morseCode.isNotEmpty)
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Row(
-                              children: [
-                                // Copy button
-                                IconButton(
-                                  onPressed: () {
-                                    ref
-                                        .read(morseConverterProvider.notifier)
-                                        .copyMorse();
-                                  },
-                                  icon: Iconify(
-                                    Ph.copy_simple_duotone,
-                                    size: iconSize,
-                                    color: colorScheme.primary,
-                                  ),
-                                ),
-                                // Play button
-                                IconButton(
-                                  onPressed: () {
-                                    ref
-                                        .read(morseConverterProvider.notifier)
-                                        .playMorse();
-                                  },
-                                  icon: Iconify(
-                                    morseState.isPlaying
-                                        ? Ph.stop_duotone
-                                        : Ph.play_duotone,
-                                    size: iconSize,
-                                    color: morseState.isPlaying
-                                        ? Colors.red.shade300
-                                        : colorScheme.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
+                  child: _buildPillContainer(
+                    context,
+                    label: "Output",
+                    child: _buildOutputContent(
+                      context,
+                      morseState,
+                      expands: true,
                     ),
+                    expands: true,
                   ),
                 ),
               ],
@@ -190,6 +118,237 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
           ),
         ],
       ),
+    );
+  }
+
+  /// Helper to build the Pill with Column layout
+  Widget _buildPillContainer(
+    BuildContext context, {
+    required String label,
+    required Widget child,
+    required bool expands,
+  }) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return ConverterPill(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 16,
+        children: [
+          Text(
+            label,
+            style: textTheme.headlineSmall?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          expands ? Expanded(child: child) : child,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInputContent(
+    BuildContext context,
+    morseState, {
+    required bool expands,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final double fontSize = 22;
+    final double lineHeight = 1.4;
+
+    final textStyle = Theme.of(context).textTheme.bodyLarge?.copyWith(
+      color: colorScheme.onSurface,
+      fontSize: fontSize,
+      height: lineHeight,
+    );
+
+    final strutStyle = StrutStyle(
+      fontSize: fontSize,
+      height: lineHeight,
+      forceStrutHeight: true,
+    );
+
+    Widget textField = TextField(
+      controller: _textController,
+      scrollController: _inputScrollController,
+      style: textStyle,
+      strutStyle: strutStyle,
+      maxLines: null,
+      expands: expands,
+      textAlignVertical: TextAlignVertical.top,
+      decoration: InputDecoration(
+        hintText: 'Type something...',
+        hintStyle: TextStyle(
+          color: colorScheme.onSurface.withValues(alpha: 0.3),
+        ),
+        border: InputBorder.none,
+        isCollapsed: true,
+        contentPadding: EdgeInsets.zero,
+      ),
+      onChanged: (value) {
+        ref.read(morseConverterProvider.notifier).textToMorse(value);
+      },
+    );
+
+    return ListenableBuilder(
+      listenable: _inputScrollController,
+      builder: (context, _) {
+        return Stack(
+          children: [
+            textField,
+            if (morseState.isPlaying && morseState.currentRawIndex != -1)
+              _ProgressIndicatorPill(
+                text: morseState.rawtext,
+                currentIndex: morseState.currentRawIndex,
+                style: textStyle!,
+                strutStyle: strutStyle,
+                scrollOffset: _inputScrollController.hasClients
+                    ? _inputScrollController.offset
+                    : 0,
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildOutputContent(
+    BuildContext context,
+    morseState, {
+    required bool expands,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final double fontSize = 28;
+    final double lineHeight = 1.4;
+
+    final textStyle = Theme.of(context).textTheme.headlineMedium?.copyWith(
+      fontSize: fontSize,
+      letterSpacing: 2,
+      color: colorScheme.onSurface,
+      height: lineHeight,
+    );
+
+    final strutStyle = StrutStyle(
+      fontSize: fontSize,
+      height: lineHeight,
+      forceStrutHeight: true,
+    );
+
+    Widget outputText = SelectableText(
+      morseState.morseCode.isEmpty ? '...' : morseState.morseCode,
+      style: textStyle,
+      strutStyle: strutStyle,
+      scrollPhysics: const BouncingScrollPhysics(),
+    );
+
+    Widget content = expands
+        ? SingleChildScrollView(
+            controller: _outputScrollController,
+            child: outputText,
+          )
+        : outputText;
+
+    return ListenableBuilder(
+      listenable: _outputScrollController,
+      builder: (context, _) {
+        return Stack(
+          children: [
+            content,
+            if (morseState.isPlaying && morseState.currentMorseIndex != -1)
+              _ProgressIndicatorPill(
+                text: morseState.morseCode,
+                currentIndex: morseState.currentMorseIndex,
+                style: textStyle!,
+                strutStyle: strutStyle,
+                scrollOffset: _outputScrollController.hasClients
+                    ? _outputScrollController.offset
+                    : 0,
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Feature 1: The moving pill indicator
+class _ProgressIndicatorPill extends StatelessWidget {
+  final String text;
+  final int currentIndex;
+  final TextStyle style;
+  final StrutStyle strutStyle;
+  final double scrollOffset;
+
+  const _ProgressIndicatorPill({
+    required this.text,
+    required this.currentIndex,
+    required this.style,
+    required this.strutStyle,
+    required this.scrollOffset,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (currentIndex < 0 || currentIndex >= text.length) {
+      return const SizedBox();
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Layout the text to find the character position
+        final tp = TextPainter(
+          text: TextSpan(text: text, style: style),
+          textDirection: TextDirection.ltr,
+          textScaler: MediaQuery.of(context).textScaler,
+          strutStyle: strutStyle,
+        )..layout(maxWidth: constraints.maxWidth);
+
+        final Offset offset = tp.getOffsetForCaret(
+          TextPosition(offset: currentIndex),
+          Rect.zero,
+        );
+
+        final double topPosition = offset.dy - scrollOffset;
+
+        // Hide if scrolled out
+        if (topPosition < -20 || topPosition > constraints.maxHeight) {
+          return const SizedBox();
+        }
+
+        // Calculate current character width
+        final currentLetterTp = TextPainter(
+          text: TextSpan(text: text[currentIndex], style: style),
+          textDirection: TextDirection.ltr,
+          textScaler: MediaQuery.of(context).textScaler,
+          strutStyle: strutStyle,
+        )..layout();
+
+        return AnimatedPositioned(
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeInOut,
+          top: topPosition - 6,
+          left: offset.dx,
+          child: Container(
+            width: currentLetterTp.width,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              borderRadius: BorderRadius.circular(2),
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.6),
+                  blurRadius: 12,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

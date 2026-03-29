@@ -9,6 +9,7 @@ import 'package:morse_web_play/screens/home.dart';
 import 'package:morse_web_play/widgets/bottombar.dart';
 import 'package:morse_web_play/widgets/sidebar.dart';
 import 'package:morse_web_play/screens/credits.dart';
+import 'package:morse_web_play/widgets/fab.dart';
 
 class PlatformDecider extends ConsumerWidget {
   const PlatformDecider({super.key});
@@ -36,13 +37,20 @@ class PlatformDecider extends ConsumerWidget {
           // Small screen
           return Scaffold(
             backgroundColor: themeMode == ThemeMode.light ? lightBg : darkBg,
-            body: IndexedStack(index: currentSection.index, children: pages),
+            body: IndexedStack(
+              index: currentSection.index,
+              children: pages,
+            ),
             bottomNavigationBar: BottomBar(
               currentIndex: currentSection.index,
               onTap: (int index) {
                 navNotifier.changeSection(AppSection.values[index]);
               },
             ),
+            // Show FAB only on Home section
+            floatingActionButton: currentSection == AppSection.converter
+                ? const MorseFloatingButtons()
+                : null,
           );
         } else {
           // Large screen
@@ -65,6 +73,10 @@ class PlatformDecider extends ConsumerWidget {
                 ),
               ],
             ),
+            // Show FAB only on Home section
+            floatingActionButton: currentSection == AppSection.converter
+                ? const MorseFloatingButtons()
+                : null,
           );
         }
       },
