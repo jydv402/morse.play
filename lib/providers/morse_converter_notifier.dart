@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:morse_web_play/models/morse_state.dart';
 import 'package:morse_web_play/providers/audio_provider.dart';
@@ -56,9 +57,15 @@ class MorseConverterNotifier extends Notifier<MorseConverterState> {
       state = state.copyWith(isPlaying: false);
     }
   }
+
+  // Function to copy the morse code
+  void copyMorse() {
+    // Copy the morse code to the clipboard
+    Clipboard.setData(ClipboardData(text: state.morseCode));
+  }
 }
 
 final morseConverterProvider =
     NotifierProvider<MorseConverterNotifier, MorseConverterState>(() {
-  return MorseConverterNotifier();
-});
+      return MorseConverterNotifier();
+    });

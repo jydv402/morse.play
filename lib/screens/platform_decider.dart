@@ -23,10 +23,10 @@ class PlatformDecider extends ConsumerWidget {
     final themeMode = ref.watch(themeProvider);
 
     // List of pages to be kept alive in IndexedStack
-    const pages = [
-      TheHomePage(),
-      BookPage(),
-      CreditsPage(),
+    final pages = [
+      const MorseConverterView(),
+      const BookPage(),
+      const CreditsPage(),
     ];
 
     // Define the LayoutBuilder
@@ -36,10 +36,7 @@ class PlatformDecider extends ConsumerWidget {
           // Small screen
           return Scaffold(
             backgroundColor: themeMode == ThemeMode.light ? lightBg : darkBg,
-            body: IndexedStack(
-              index: currentSection.index,
-              children: pages,
-            ),
+            body: IndexedStack(index: currentSection.index, children: pages),
             bottomNavigationBar: BottomBar(
               currentIndex: currentSection.index,
               onTap: (int index) {
