@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:morse_web_play/models/colors.dart';
 import 'package:morse_web_play/models/nav_model.dart';
 import 'package:morse_web_play/providers/nav_provider.dart';
-import 'package:morse_web_play/providers/theme_provider.dart';
 import 'package:morse_web_play/screens/book.dart';
 import 'package:morse_web_play/screens/home.dart';
 import 'package:morse_web_play/widgets/bottombar.dart';
 import 'package:morse_web_play/widgets/sidebar.dart';
 import 'package:morse_web_play/screens/credits.dart';
+import 'package:morse_web_play/widgets/fab.dart';
 
 class PlatformDecider extends ConsumerWidget {
   const PlatformDecider({super.key});
@@ -19,14 +18,12 @@ class PlatformDecider extends ConsumerWidget {
     final currentSection = ref.watch(navProvider);
     // Read the notifier for state changes
     final navNotifier = ref.read(navProvider.notifier);
-    // Get theme mode
-    final themeMode = ref.watch(themeProvider);
 
     // List of pages to be kept alive in IndexedStack
-    const pages = [
-      TheHomePage(),
-      BookPage(),
-      CreditsPage(),
+    final pages = [
+      const MorseConverterView(),
+      const BookPage(),
+      const CreditsPage(),
     ];
 
     // Define the LayoutBuilder
@@ -35,7 +32,6 @@ class PlatformDecider extends ConsumerWidget {
         if (constraints.maxWidth < 600) {
           // Small screen
           return Scaffold(
-            backgroundColor: themeMode == ThemeMode.light ? lightBg : darkBg,
             body: IndexedStack(
               index: currentSection.index,
               children: pages,
@@ -46,11 +42,14 @@ class PlatformDecider extends ConsumerWidget {
                 navNotifier.changeSection(AppSection.values[index]);
               },
             ),
+            // Show FAB only on Home section
+            floatingActionButton: currentSection == AppSection.converter
+                ? const MorseFloatingButtons()
+                : null,
           );
         } else {
           // Large screen
           return Scaffold(
-            backgroundColor: themeMode == ThemeMode.light ? lightBg : darkBg,
             body: Row(
               children: [
                 CustomSidebar(
@@ -68,6 +67,10 @@ class PlatformDecider extends ConsumerWidget {
                 ),
               ],
             ),
+            // Show FAB only on Home section
+            floatingActionButton: currentSection == AppSection.converter
+                ? const MorseFloatingButtons()
+                : null,
           );
         }
       },

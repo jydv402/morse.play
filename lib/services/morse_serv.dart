@@ -121,16 +121,18 @@ class MorseService {
   };
 
   /// Static method to convert text to Morse.
-  /// Decoupled from the Service instance so it can be used with `compute()`.
+  /// Standard Morse: 1 space between letters, 3 spaces between words.
   static String convert(String text) {
+    if (text.isEmpty) return '';
     return text
+        .trim()
         .toUpperCase()
-        .split('')
-        .map((char) {
-          if (char == ' ') return '  ';
-          return morseCode[char] ?? char;
-        })
-        .join(' ');
+        .split(' ')
+        .map(
+          (word) =>
+              word.split('').map((char) => morseCode[char] ?? char).join(' '),
+        )
+        .join('   ');
   }
 
   // Non-static conversion logic (optional, for instance calls)

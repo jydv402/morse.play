@@ -3,7 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 class MorseAudioService {
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  // 1 unit duration = 60ms
+  // 1 unit duration = 80ms
   static const int _unitDuration = 80;
 
   // Dot duration is one unit
@@ -24,70 +24,83 @@ class MorseAudioService {
   // Bool for player state
   bool isPlaying = false;
 
+  // Progress callback
+  void Function(int rawIndex, int morseIndex)? onProgress;
+
   // Global service function
-  Future<void> playMorse(String morseCode) async {
+  Future<void> playMorse(String rawText, String morseCode) async {
+    // Ensure any previous loop is stopped
+    stopAudio();
+    
     // Set playing to true
     isPlaying = true;
 
     // Small initial delay to ensure the player is ready
     await Future.delayed(const Duration(milliseconds: 50));
 
+    int rawIndex = 0;
+    
     // Iteratively call the _playBeep function
     for (var i = 0; i < morseCode.length; i++) {
-      // Obtain the current Morse character
-      final curr = morseCode[i];
-
       if (!isPlaying) break;
+
+      // Notify progress for each dot/dash/space
+      onProgress?.call(rawIndex, i);
+
+      final curr = morseCode[i];
 
       switch (curr) {
         case '.':
           await _playBeep(_dotDuration);
-          // Pause after the dot (intra-element space)
-          await Future.delayed(Duration(milliseconds: _pauseDuration));
+          if (isPlaying) await Future.delayed(Duration(milliseconds: _pauseDuration));
           break;
 
         case '-':
           await _playBeep(_dashDuration);
-          // Pause after the dash (intra-element space)
-          await Future.delayed(Duration(milliseconds: _pauseDuration));
+          if (isPlaying) await Future.delayed(Duration(milliseconds: _pauseDuration));
           break;
 
         case ' ':
-          if (i < morseCode.length - 1 && morseCode[i + 1] == ' ') {
-            // It is a word break
-            await Future.delayed(Duration(milliseconds: _wordPauseDuration));
-            // Exclude next space
-            i++;
+          // Detect word break (3 spaces) vs letter break (1 space)
+          if (i + 2 < morseCode.length && morseCode[i + 1] == ' ' && morseCode[i + 2] == ' ') {
+            // Word break: advance source index past both the character and the space
+            if (isPlaying) await Future.delayed(Duration(milliseconds: _wordPauseDuration));
+            i += 2;
+            rawIndex += 2; 
           } else {
-            // It is a letter break
-            await Future.delayed(Duration(milliseconds: _letterPauseDuration));
+            // Letter break: source character finished
+            if (isPlaying) await Future.delayed(Duration(milliseconds: _letterPauseDuration));
+            rawIndex++;
           }
           break;
 
-        // Ignore other characters
         default:
           break;
       }
     }
 
-    // Set playing to false at the end
+    // Reset progress at the end
+    onProgress?.call(-1, -1);
     isPlaying = false;
   }
 
   // The audio player function
   Future<void> _playBeep(int duration) async {
-    // Play the audio
-    await _audioPlayer.play(AssetSource('beep.mp3'), volume: 0.5);
-    // Continue playing the audio
-    await Future.delayed(Duration(milliseconds: duration));
-    // Stop the audio
-    await _audioPlayer.stop();
+    if (!isPlaying) return;
+    try {
+      await _audioPlayer.play(AssetSource('beep.mp3'), volume: 0.5);
+      await Future.delayed(Duration(milliseconds: duration));
+      await _audioPlayer.stop();
+    } catch (e) {
+      // Ignore audio errors during rapid play/stop
+    }
   }
 
   // Audio stop function
-  void stopAudio() async {
+  void stopAudio() {
     isPlaying = false;
-    await _audioPlayer.stop();
+    _audioPlayer.stop();
+    onProgress?.call(-1, -1);
   }
 
   // Cleanup function

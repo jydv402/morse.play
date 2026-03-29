@@ -26,7 +26,7 @@ class BookAudioNotifier extends Notifier<String?> {
     state = char;
 
     try {
-      await audioService.playMorse(morseCode);
+      await audioService.playMorse(char, morseCode);
     } catch (e) {
       // Handle playback errors
       logger.e("Audio playback error in Book: $e");

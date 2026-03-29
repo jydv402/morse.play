@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:morse_web_play/models/morse_state.dart';
 import 'package:morse_web_play/providers/audio_provider.dart';
@@ -7,6 +8,16 @@ import 'package:morse_web_play/services/morse_serv.dart';
 class MorseConverterNotifier extends Notifier<MorseConverterState> {
   @override
   MorseConverterState build() {
+    // Set the progress callback in the AudioService once
+    final audioService = ref.read(audioServiceProvider);
+    audioService.onProgress = (rawIdx, morseIdx) {
+      if (state.isPlaying) {
+        state = state.copyWith(
+          currentRawIndex: rawIdx,
+          currentMorseIndex: morseIdx,
+        );
+      }
+    };
     return const MorseConverterState();
   }
 
@@ -38,7 +49,11 @@ class MorseConverterNotifier extends Notifier<MorseConverterState> {
 
     if (state.isPlaying) {
       audioService.stopAudio();
-      state = state.copyWith(isPlaying: false);
+      state = state.copyWith(
+        isPlaying: false,
+        currentRawIndex: -1,
+        currentMorseIndex: -1,
+      );
       return;
     }
 
@@ -47,18 +62,32 @@ class MorseConverterNotifier extends Notifier<MorseConverterState> {
 
     // Call the playMorse method found in MorseAudioService
     try {
-      await audioService.playMorse(state.morseCode);
+      await audioService.playMorse(state.rawtext, state.morseCode);
     } catch (e) {
       // Handle any errors during playback
       debugPrint("Audio playback error: $e");
     } finally {
       // Set isplaying to false
-      state = state.copyWith(isPlaying: false);
+      state = state.copyWith(
+        isPlaying: false,
+        currentRawIndex: -1,
+        currentMorseIndex: -1,
+      );
     }
+  }
+
+  // Function to copy the morse code
+  void copyMorse() {
+    // Copy the morse code to the clipboard
+    Clipboard.setData(ClipboardData(text: state.morseCode));
+  }
+
+  void clearAll() {
+    state = const MorseConverterState();
   }
 }
 
 final morseConverterProvider =
     NotifierProvider<MorseConverterNotifier, MorseConverterState>(() {
-  return MorseConverterNotifier();
-});
+      return MorseConverterNotifier();
+    });

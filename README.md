@@ -1,4 +1,4 @@
-# morse_web_play
+# morse.play
 
 A new Flutter project.
 
