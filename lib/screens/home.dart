@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:morse_web_play/providers/morse_converter_notifier.dart';
 import 'package:morse_web_play/widgets/brand_bar.dart';
@@ -39,9 +40,13 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
     final size = MediaQuery.of(context).size;
     final bool isMobile = size.width < 600;
 
-    // Sync the local controller if changed externally
-    if (_textController.text != morseState.rawtext) {
-      _textController.text = morseState.rawtext;
+    // Logic to sync the controller text with the correct state field
+    final String currentInput = morseState.isMorseToText
+        ? morseState.morseCode
+        : morseState.rawtext;
+
+    if (_textController.text != currentInput) {
+      _textController.text = currentInput;
     }
 
     if (isMobile) {
@@ -61,14 +66,14 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
           const BrandBar(),
           _buildPillContainer(
             context,
-            label: "Input",
+            label: morseState.isMorseToText ? "Morse Input" : "Text Input",
             child: _buildInputContent(context, morseState, expands: false),
             expands: false,
           ),
           const SizedBox(height: 12),
           _buildPillContainer(
             context,
-            label: "Output",
+            label: morseState.isMorseToText ? "Text Output" : "Morse Output",
             child: _buildOutputContent(context, morseState, expands: false),
             expands: false,
           ),
@@ -92,7 +97,9 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
                 Expanded(
                   child: _buildPillContainer(
                     context,
-                    label: "Input",
+                    label: morseState.isMorseToText
+                        ? "Morse Input"
+                        : "Text Input",
                     child: _buildInputContent(
                       context,
                       morseState,
@@ -104,7 +111,9 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
                 Expanded(
                   child: _buildPillContainer(
                     context,
-                    label: "Output",
+                    label: morseState.isMorseToText
+                        ? "Text Output"
+                        : "Morse Output",
                     child: _buildOutputContent(
                       context,
                       morseState,
@@ -178,8 +187,14 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
       maxLines: null,
       expands: expands,
       textAlignVertical: TextAlignVertical.top,
+      inputFormatters: [
+        if (morseState.isMorseToText)
+          FilteringTextInputFormatter.allow(RegExp(r'[.\-\s]')),
+      ],
       decoration: InputDecoration(
-        hintText: 'Type something...',
+        hintText: morseState.isMorseToText
+            ? 'Type morse code...'
+            : 'Type something...',
         hintStyle: TextStyle(
           color: colorScheme.onSurface.withValues(alpha: 0.3),
         ),
@@ -188,7 +203,7 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
         contentPadding: EdgeInsets.zero,
       ),
       onChanged: (value) {
-        ref.read(morseConverterProvider.notifier).textToMorse(value);
+        ref.read(morseConverterProvider.notifier).updateInput(value);
       },
     );
 
@@ -197,10 +212,17 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
         return Stack(
           children: [
             textField,
-            if (morseState.isPlaying && morseState.currentRawIndex != -1)
+            if (morseState.isPlaying &&
+                (morseState.isMorseToText
+                    ? morseState.currentMorseIndex != -1
+                    : morseState.currentRawIndex != -1))
               _ProgressIndicatorPill(
-                text: morseState.rawtext,
-                currentIndex: morseState.currentRawIndex,
+                text: morseState.isMorseToText
+                    ? morseState.morseCode
+                    : morseState.rawtext,
+                currentIndex: morseState.isMorseToText
+                    ? morseState.currentMorseIndex
+                    : morseState.currentRawIndex,
                 style: textStyle!,
                 strutStyle: strutStyle,
                 scrollOffset: _inputScrollController.hasClients
@@ -237,8 +259,12 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
       forceStrutHeight: true,
     );
 
+    final String displayContent = morseState.isMorseToText
+        ? morseState.rawtext
+        : morseState.morseCode;
+
     Widget outputText = SelectableText(
-      morseState.morseCode.isEmpty ? '...' : morseState.morseCode,
+      displayContent.isEmpty ? '...' : displayContent,
       style: textStyle,
       strutStyle: strutStyle,
       scrollPhysics: const BouncingScrollPhysics(),
@@ -256,10 +282,17 @@ class _MorseConverterViewState extends ConsumerState<MorseConverterView> {
         return Stack(
           children: [
             content,
-            if (morseState.isPlaying && morseState.currentMorseIndex != -1)
+            if (morseState.isPlaying &&
+                (morseState.isMorseToText
+                    ? morseState.currentRawIndex != -1
+                    : morseState.currentMorseIndex != -1))
               _ProgressIndicatorPill(
-                text: morseState.morseCode,
-                currentIndex: morseState.currentMorseIndex,
+                text: morseState.isMorseToText
+                    ? morseState.rawtext
+                    : morseState.morseCode,
+                currentIndex: morseState.isMorseToText
+                    ? morseState.currentRawIndex
+                    : morseState.currentMorseIndex,
                 style: textStyle!,
                 strutStyle: strutStyle,
                 scrollOffset: _outputScrollController.hasClients
@@ -341,7 +374,9 @@ class _ProgressIndicatorPill extends StatelessWidget {
           borderRadius: BorderRadius.circular(3),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.6),
               blurRadius: 10,
               spreadRadius: 2,
             ),

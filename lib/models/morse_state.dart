@@ -2,12 +2,14 @@ class MorseConverterState {
   final String rawtext;
   final String morseCode;
   final bool isPlaying;
+  final bool isMorseToText;
   final int currentRawIndex;
   final int currentMorseIndex;
 
   const MorseConverterState({
     this.rawtext = '',
     this.morseCode = '',
+    this.isMorseToText = false,
     this.isPlaying = false,
     this.currentRawIndex = -1,
     this.currentMorseIndex = -1,
@@ -17,6 +19,7 @@ class MorseConverterState {
   MorseConverterState copyWith({
     String? rawtext,
     String? morseCode,
+    bool? isMorseToText,
     bool? isPlaying,
     int? currentRawIndex,
     int? currentMorseIndex,
@@ -26,6 +29,8 @@ class MorseConverterState {
       rawtext: rawtext ?? this.rawtext,
       // Stores the converted morse code
       morseCode: morseCode ?? this.morseCode,
+      // Current mode
+      isMorseToText: isMorseToText ?? this.isMorseToText,
       // Stores the bool value for checking if the audio is playing or not
       isPlaying: isPlaying ?? this.isPlaying,
       // Current character being played
