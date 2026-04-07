@@ -21,26 +21,34 @@ class MorseConverterNotifier extends Notifier<MorseConverterState> {
     return const MorseConverterState();
   }
 
-  /// Offloads the text-to-morse conversion to a background Isolate
-  /// using Flutter's compute function.
-  void textToMorse(String text) async {
-    // If input is very small, convert directly to avoid isolate overhead
-    if (text.length < 50) {
-      final morseCode = MorseService.convert(text);
-      state = state.copyWith(morseCode: morseCode, rawtext: text);
-      return;
-    }
-
-    // Create a local copy of text
-    final input = text;
-
-    // Use compute to perform the conversion on a separate thread
-    final morseCode = await compute(MorseService.convert, input);
-
-    // Ensure the state update is only applied if the input hasn't changed
-    // in the meantime (optional check, depends on desired UX)
-    state = state.copyWith(morseCode: morseCode, rawtext: text);
+  /// Toggles the conversion mode
+  void toggleMode() {
+    state = state.copyWith(
+      isMorseToText: !state.isMorseToText,
+    );
   }
+
+  /// General conversion function that handles both directions
+  void updateInput(String input) async {
+    if (state.isMorseToText) {
+      // Morse to Text
+      final convertedText = MorseService.convertToText(input);
+      state = state.copyWith(rawtext: convertedText, morseCode: input);
+    } else {
+      // Text to Morse
+      if (input.length < 50) {
+        final morseCode = MorseService.convert(input);
+        state = state.copyWith(morseCode: morseCode, rawtext: input);
+        return;
+      }
+
+      final morseCode = await compute(MorseService.convert, input);
+      state = state.copyWith(morseCode: morseCode, rawtext: input);
+    }
+  }
+
+  /// Legacy method kept for compatibility or specific calls
+  void textToMorse(String text) => updateInput(text);
 
   // Function to play the audio
   void playMorse() async {

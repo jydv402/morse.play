@@ -119,6 +119,10 @@ class MorseService {
     '_': '..--.-',
     '\'': '.----.',
   };
+  
+  /// Static map for Morse to Text lookup.
+  static final Map<String, String> textCode = 
+      morseCode.map((key, value) => MapEntry(value, key));
 
   /// Static method to convert text to Morse.
   /// Standard Morse: 1 space between letters, 3 spaces between words.
@@ -135,8 +139,26 @@ class MorseService {
         .join('   ');
   }
 
+  /// Static method to convert Morse to Text.
+  /// Standard Morse: 1 space between letters, 3 spaces between words.
+  static String convertToText(String morse) {
+    if (morse.trim().isEmpty) return '';
+    return morse
+        .trim()
+        .split('   ') // Split into words
+        .map((word) => word
+            .split(' ') // Split into characters
+            .map((char) => textCode[char] ?? '') // Lookup character
+            .join(''))
+        .join(' '); // Join words with space
+  }
+
   // Non-static conversion logic (optional, for instance calls)
   String textToMorse(String text) {
     return convert(text);
+  }
+
+  String morseToText(String morse) {
+    return convertToText(morse);
   }
 }

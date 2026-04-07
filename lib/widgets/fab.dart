@@ -5,7 +5,8 @@ import 'package:iconify_flutter/icons/ph.dart';
 import 'package:morse_web_play/providers/morse_converter_notifier.dart';
 
 class MorseFloatingButtons extends ConsumerWidget {
-  const MorseFloatingButtons({super.key});
+  final bool isMobile;
+  const MorseFloatingButtons({super.key, required this.isMobile});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -13,17 +14,22 @@ class MorseFloatingButtons extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     // Set the icon size for the FAB
-    const double iconSize = 28;
+    double iconSize = isMobile ? 14 : 28;
+    double padding = isMobile ? 4 : 8;
+    double borderRadius = isMobile ? 16 : 24;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      spacing: 8,
+      spacing: padding,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(
+            horizontal: padding * 2,
+            vertical: padding,
+          ),
           decoration: BoxDecoration(
             color: colorScheme.primary,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
           child: // Play FAB
           IconButton(
@@ -40,14 +46,17 @@ class MorseFloatingButtons extends ConsumerWidget {
         ),
 
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(
+            horizontal: padding * 2,
+            vertical: padding,
+          ),
           decoration: BoxDecoration(
             color: colorScheme.primary,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            spacing: 16,
+            spacing: padding * 2,
             children: [
               // Clear button
               IconButton(
@@ -55,7 +64,7 @@ class MorseFloatingButtons extends ConsumerWidget {
                 onPressed: () {
                   ref.read(morseConverterProvider.notifier).clearAll();
                 },
-                icon: const Iconify(
+                icon: Iconify(
                   Ph.trash_duotone,
                   size: iconSize,
                   color: Colors.white,
@@ -67,7 +76,7 @@ class MorseFloatingButtons extends ConsumerWidget {
                 onPressed: () {
                   ref.read(morseConverterProvider.notifier).copyMorse();
                 },
-                icon: const Iconify(
+                icon: Iconify(
                   Ph.copy_simple_duotone,
                   size: iconSize,
                   color: Colors.white,
@@ -77,15 +86,18 @@ class MorseFloatingButtons extends ConsumerWidget {
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(
+            horizontal: padding * 2,
+            vertical: padding,
+          ),
           decoration: BoxDecoration(
             color: colorScheme.secondary,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
           child: IconButton(
             tooltip: 'Swap',
             onPressed: () {
-              // TODO : Swap mode from text to morse and vice versa
+              ref.read(morseConverterProvider.notifier).toggleMode();
             },
             icon: Iconify(
               Ph.arrows_left_right_duotone,

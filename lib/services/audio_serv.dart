@@ -3,8 +3,8 @@ import 'package:audioplayers/audioplayers.dart';
 class MorseAudioService {
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  // 1 unit duration = 80ms
-  static const int _unitDuration = 80;
+  // 1 unit duration = 110ms (Slower for better legibility)
+  static const int _unitDuration = 110;
 
   // Dot duration is one unit
   final int _dotDuration = _unitDuration;

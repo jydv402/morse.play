@@ -32,20 +32,26 @@ class PlatformDecider extends ConsumerWidget {
         if (constraints.maxWidth < 600) {
           // Small screen
           return Scaffold(
-            body: IndexedStack(
-              index: currentSection.index,
-              children: pages,
-            ),
+            body: IndexedStack(index: currentSection.index, children: pages),
             bottomNavigationBar: BottomBar(
               currentIndex: currentSection.index,
               onTap: (int index) {
                 navNotifier.changeSection(AppSection.values[index]);
               },
             ),
-            // Show FAB only on Home section
-            floatingActionButton: currentSection == AppSection.converter
-                ? const MorseFloatingButtons()
-                : null,
+            // Show FAB only on Home section with custom fade animation
+            floatingActionButton: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              child: currentSection == AppSection.converter
+                  ? const MorseFloatingButtons(
+                      key: ValueKey('fab'),
+                      isMobile: true,
+                    )
+                  : const SizedBox.shrink(key: ValueKey('none')),
+            ),
           );
         } else {
           // Large screen
@@ -67,10 +73,19 @@ class PlatformDecider extends ConsumerWidget {
                 ),
               ],
             ),
-            // Show FAB only on Home section
-            floatingActionButton: currentSection == AppSection.converter
-                ? const MorseFloatingButtons()
-                : null,
+            // Show FAB only on Home section with custom fade animation
+            floatingActionButton: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+              child: currentSection == AppSection.converter
+                  ? const MorseFloatingButtons(
+                      key: ValueKey('fab'),
+                      isMobile: false,
+                    )
+                  : const SizedBox.shrink(key: ValueKey('none')),
+            ),
           );
         }
       },
